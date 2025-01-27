@@ -30,17 +30,18 @@ sa_graph = nx.MultiGraph()
 sa_graph.add_edges_from(sa)
 
 # Plot the system architecture
-nx.draw(sa_graph, with_labels=True)
-plt.show()
+# nx.draw(sa_graph, with_labels=True)
+# plt.show()
 
 
 # %% Enumerate all Unique Spatial Topologies
 
 # User Input
-number_of_crossings = 2
+number_of_crossings = 3
 
 unique_spatial_topologies, number_topologies = enumerate_yamada_classes(sa_graph, number_of_crossings)
 
+print("Done")
 
 # %% Generate A Near-Planar Geometric Realization of Each Unique Spatial Topology
 

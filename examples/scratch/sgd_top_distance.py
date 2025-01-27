@@ -4,6 +4,9 @@ from yamada.sgd.sgd_analysis import available_crossing_swaps
 from yamada.sgd.sgd_modification import apply_crossing_swap
 from yamada.sgd.topological_distance import compute_min_distance
 
+import os
+print("PATH:", os.environ.get("PATH"))
+
 e1 = Edge('e1')
 e2 = Edge('e2')
 e3 = Edge('e3')

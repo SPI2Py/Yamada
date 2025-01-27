@@ -22,38 +22,13 @@ def read_edge_code(stream, size):
     return ans
 
 
-def shadows_via_plantri_by_ascii(plantri_directory, num_tri_verts, num_crossings):
+
+def shadows_via_plantri_by_edge_codes(num_tri_verts, num_crossings):
     assert num_tri_verts % 2 == 0
     vertices = num_tri_verts + num_crossings
     edges = (3 * num_tri_verts + 4 * num_crossings) // 2
     faces = 2 - vertices + edges
-    cmd = [plantri_directory+'plantri',
-           '-p -d',  # simple planar maps, but return the dual
-           '-f4',  # maximum valence in the returned dual is <= 4
-           '-c1',  # graph should be 1-connected
-           '-m2',  # no valence 1 vertices = no loops in the dual
-           '-a',  # return in ascii format
-           '-e%d' % edges,
-           '%d' % faces]
-    proc = subprocess.run(' '.join(cmd), shell=True, text=True, capture_output=True)
-    ans = []
-    for line in proc.stdout.splitlines():
-        graph_data = line.split()[1].split(',')
-        counts = collections.Counter(len(v) for v in graph_data)
-        assert counts[3] == num_tri_verts and counts[4] == num_crossings
-        ans.append(graph_data)
-    return ans
-
-
-
-
-
-def shadows_via_plantri_by_edge_codes(plantri_directory, num_tri_verts, num_crossings):
-    assert num_tri_verts % 2 == 0
-    vertices = num_tri_verts + num_crossings
-    edges = (3 * num_tri_verts + 4 * num_crossings) // 2
-    faces = 2 - vertices + edges
-    cmd = [plantri_directory+'plantri',
+    cmd = ['plantri',
            '-p -d',  # simple planar maps, but return the dual
            '-f4',  # maximum valence in the returned dual is <= 4
            '-c1',  # graph should be 1-connected
@@ -61,6 +36,11 @@ def shadows_via_plantri_by_edge_codes(plantri_directory, num_tri_verts, num_cros
            '-E',  # return binary edge code format
            '-e%d' % edges,
            '%d' % faces]
+
+    # result = subprocess.run("plantri -p -d -f4 -c1 -m2 -E -e9 5", shell=True, capture_output=True)
+    # print(result.stdout)
+    # print(result.stderr)
+
     proc = subprocess.run(' '.join(cmd), shell=True, capture_output=True)
     stdout = io.BytesIO(proc.stdout)
     assert stdout.read(13) == b'>>edge_code<<'
@@ -108,10 +88,14 @@ class Shadow:
                 e = 0 if E.adjacent[0] is None else 1
                 C[(i + signs[c]) % 4] = E[e]
 
-        return SpatialGraphDiagram(classes, check=check)
+        edges = [E for E in classes if isinstance(E, Edge)]
+        vertices = [V for V in classes if isinstance(V, Vertex)]
+        crossings = [C for C in classes if isinstance(C, Crossing)]
+        # return SpatialGraphDiagram(classes, check=check)
+        return SpatialGraphDiagram(edges=edges, vertices=vertices, crossings=crossings)
 
 
-def spatial_graph_diagrams_fixed_crossings(plantri_directory, G, crossings):
+def spatial_graph_diagrams_fixed_crossings(G, crossings):
     """
     Let's start with the theta graph
 
@@ -122,7 +106,7 @@ def spatial_graph_diagrams_fixed_crossings(plantri_directory, G, crossings):
     assert all(d == 3 for v, d in G.degree)
     assert all(a != b for a, b in G.edges())
 
-    raw_shadows = shadows_via_plantri_by_edge_codes(plantri_directory, G.number_of_nodes(), crossings)
+    raw_shadows = shadows_via_plantri_by_edge_codes(G.number_of_nodes(), crossings)
 
     for raw_shadow in raw_shadows:
         shadow = Shadow(raw_shadow)
@@ -138,16 +122,16 @@ def spatial_graph_diagrams_fixed_crossings(plantri_directory, G, crossings):
                         for signs in itertools.product((0, 1), repeat=num_cross - 1):
                             signs = (0,) + signs
                             D = shadow.spatial_graph_diagram(signs=signs, check=False)
-                            D_has_r2 = available_r2_moves(D)
+                            D_has_r2 = len(available_r2_moves(D)) > 0
                             if not D_has_r2:
                                 yield D
 
 
-def enumerate_yamada_classes(plantri_directory, G, max_crossings):
+def enumerate_yamada_classes(G, max_crossings):
     examined = 0
     polys = dict()
     for crossings in range(0, max_crossings + 1):
-        for D in spatial_graph_diagrams_fixed_crossings(plantri_directory, G, crossings):
+        for D in spatial_graph_diagrams_fixed_crossings(G, crossings):
             p = D.yamada_polynomial()
             if p not in polys:
                 polys[p] = D
