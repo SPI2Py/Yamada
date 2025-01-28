@@ -13,6 +13,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from yamada import enumerate_yamada_classes
+from yamada.sgd.topological_distance import compute_min_distance
 
 # %% Define the System Architecture and Component Geometries
 
@@ -37,9 +38,24 @@ sa_graph.add_edges_from(sa)
 # %% Enumerate all Unique Spatial Topologies
 
 # User Input
-number_of_crossings = 3
+number_of_crossings = 4
 
 unique_spatial_topologies, number_topologies = enumerate_yamada_classes(sa_graph, number_of_crossings)
+
+sgds = list(unique_spatial_topologies.values())
+
+from itertools import combinations
+sgd_pairs = list(combinations(sgds, 2))
+
+print("Number of Enumerated Spatial Topologies: ", number_topologies)
+print("Number of Unique Spatial Topologies: ", len(unique_spatial_topologies))
+print("Number of Pairs of Unique Spatial Topologies: ", len(sgd_pairs))
+
+
+td1 = compute_min_distance(sgd_pairs[0][0], sgd_pairs[0][1])
+print("Topological Distance: ", td1)
+
+
 
 print("Done")
 

@@ -37,10 +37,6 @@ def shadows_via_plantri_by_edge_codes(num_tri_verts, num_crossings):
            '-e%d' % edges,
            '%d' % faces]
 
-    # result = subprocess.run("plantri -p -d -f4 -c1 -m2 -E -e9 5", shell=True, capture_output=True)
-    # print(result.stdout)
-    # print(result.stderr)
-
     proc = subprocess.run(' '.join(cmd), shell=True, capture_output=True)
     stdout = io.BytesIO(proc.stdout)
     assert stdout.read(13) == b'>>edge_code<<'

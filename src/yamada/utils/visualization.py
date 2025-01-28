@@ -1,8 +1,12 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import networkx as nx
+import pyvista as pv
+import itertools
+from itertools import combinations
 from networkx.algorithms.planar_drawing import triangulate_embedding
 import numpy as np
-from yamada.sgd.sgd_analysis import split_edges
+from yamada.sgd.sgd_modification import split_edges
 
 
 def tutte_system(planar_graph):
@@ -109,7 +113,6 @@ def position_spatial_graph_in_3d(G, z_height=20):
     crossings = list(other_node_pos.keys())
     crossing_positions = list(other_node_pos.values())
 
-
     # Extract non crossings from crossings
     noncrossings, noncrossing_positions = zip(*[(crossing, crossing_position) for crossing, crossing_position in zip(crossings, crossing_positions) if "C" not in crossing])
 
@@ -124,36 +127,110 @@ def position_spatial_graph_in_3d(G, z_height=20):
 
     return nodes, node_positions, segments
 
+def plot_spatial_graph_diagram():
+    pass
 
-def position_spatial_graphs_in_3d(ust_dict, z_height=20):
 
-    sg_inputs = []
+def plot_spatial_graph(nodes, node_positions, edges, contiguous_sub_edges, contiguous_sub_edge_positions):
 
-    for ust in list(ust_dict.values()):
+    # Define a list of colors to cycle through
+    color_list = list(mcolors.TABLEAU_COLORS.keys())
+    color_cycle = itertools.cycle(color_list)
 
-        nodes, node_positions, edges = position_spatial_graph_in_3d(ust, z_height)
-        node_positions = {node: position for node, position in zip(nodes, node_positions)}
-        sg_inputs.append((nodes, node_positions, edges))
+    # plotter = pv.Plotter()
+    p = pv.Plotter(shape=(1, 2), window_size=[2000, 1000])
 
-    return sg_inputs
+    # Plot the 3D Spatial Graph in the first subplot
+    p.subplot(0, 0)
+    p.add_title("3D Spatial Graph")
 
-def plot_spatial_graph(nodes, node_positions, edges):
+    # # Function to calculate offset position
+    # def calculate_offset_position(position, offset=[0.1, 0.1, 0.1]):
+    #     return position + np.array(offset)
 
-    # Create a 3D plot
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    for contiguous_edge, contiguous_edge_positions_i in zip(contiguous_sub_edges, contiguous_sub_edge_positions):
+        start_node = contiguous_edge[0]
+        end_node = contiguous_edge[-1]
+        start_position = contiguous_edge_positions_i[0][0]
+        end_position = contiguous_edge_positions_i[-1][1]
 
-    # Plot nodes
-    for node, position in node_positions.items():
-        ax.scatter(*position, label=node)
+        # TODO Use something more consistent than if "string" in node
+        # color = "red" if "Crossing" in start_node else "black"
+        # p.add_mesh(pv.Sphere(radius=0.05, center=start_position), color=color, opacity=0.5)
+        # offset_start_position = calculate_offset_position(start_position)
+        # p.add_point_labels([offset_start_position], [f"{start_node}"], point_size=0, font_size=12, text_color='black')
 
-    # Plot edges
-    for edge in edges:
-        edge_positions = [node_positions[node] for node in edge]
-        edge_positions = np.array(edge_positions)
-        ax.plot(edge_positions[:, 0], edge_positions[:, 1], edge_positions[:, 2])
+        # # TODO Use something more consistent than if "string" in node
+        # color = "red" if "Crossing" in end_node else "black"
+        # p.add_mesh(pv.Sphere(radius=0.05, center=end_position), color=color, opacity=0.5)
+        # offset_end_position = calculate_offset_position(end_position)
+        # p.add_point_labels([offset_end_position], [f"{end_node}"], point_size=0, font_size=12, text_color='black')
 
-    plt.show()
+    # Plot the Projected lines
+    for i, contiguous_sub_edge_positions_i in enumerate(contiguous_sub_edge_positions):
+        lines = []
+        color = next(color_cycle)
+        for sub_edge_position_1, sub_edge_position_2 in contiguous_sub_edge_positions_i:
+            start = sub_edge_position_1
+            end = sub_edge_position_2
+
+            line = pv.Line(start, end)
+            lines.append(line)
+
+        linear_spline = pv.MultiBlock(lines)
+        # p.add_mesh(linear_spline, line_width=5, color=color)
+        p.add_mesh(linear_spline, line_width=5, color="k")
+
+    # Configure the plot
+    p.view_isometric()
+    p.show_axes()
+
+    # Reset the color cycle for 2D edges
+    color_cycle = itertools.cycle(color_list)
+
+    # Plot the 2D Projection in the second subplot
+    p.subplot(0, 1)
+    p.add_title("2D Projection")
+
+    # Plot the Projected lines in 2D
+    for i, contiguous_sub_edge_positions_i in enumerate(contiguous_sub_edge_positions):
+        lines = []
+        color = next(color_cycle)
+        for sub_edge_position_1, sub_edge_position_2 in contiguous_sub_edge_positions_i:
+            start = sub_edge_position_1
+            end = sub_edge_position_2
+
+            line = pv.Line((start[0], 0, start[2]), (end[0], 0, end[2]))
+            lines.append(line)
+
+        linear_spline = pv.MultiBlock(lines)
+        p.add_mesh(linear_spline, line_width=5, color=color, label=f"Edge {i}")
+
+    # Configure the plot
+    p.view_xz()
+    p.show_axes()
+    # p.add_legend(size=(0.1, 0.5), border=True, bcolor='white', loc='center right')
+
+    return p
+
+
+# def plot_spatial_graph(nodes, node_positions, edges):
+#
+#     # Create a 3D plot
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111, projection='3d')
+#
+#     # Plot nodes
+#     for node, position in node_positions.items():
+#         ax.scatter(*position, label=node)
+#
+#     # Plot edges
+#     for edge in edges:
+#         edge_positions = [node_positions[node] for node in edge]
+#         edge_positions = np.array(edge_positions)
+#         ax.plot(edge_positions[:, 0], edge_positions[:, 1], edge_positions[:, 2])
+#
+#     plt.show()
 
 
 
