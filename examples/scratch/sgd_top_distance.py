@@ -3,7 +3,6 @@ from yamada import Edge, Crossing, Vertex, SpatialGraphDiagram
 from yamada.sgd.sgd_analysis import available_crossing_swaps
 from yamada.sgd.sgd_modification import apply_crossing_swap
 from yamada.sgd.topological_distance import compute_min_distance
-from yamada.utils.visualization import plot_spatial_graph
 
 e1 = Edge('e1')
 e2 = Edge('e2')
@@ -60,4 +59,4 @@ sgd = SpatialGraphDiagram(edges=[e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e
                           vertices=[v1, v2, v3, v4],
                           crossings=[c1, c2, c3])
 
-# plot_spatial_graph(sgd)
+sgd.plot()

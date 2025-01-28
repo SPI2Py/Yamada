@@ -55,7 +55,7 @@ import numpy as np
 from yamada.poly.H_polynomial import h_poly
 from yamada.poly.utilities import get_coefficients_and_exponents, normalize_poly
 from yamada.sgd.diagram_elements import Vertex, Edge, Crossing
-
+from ..utils.visualization import plot_spatial_graph_diagram
 
 class SpatialGraphDiagram:
 
@@ -639,12 +639,13 @@ class SpatialGraphDiagram:
         edge_labels = {}
 
         # Add nodes for vertices, crossings, and edges with their type
-        for crossing in self.crossings:
-            G.add_node(crossing.label, type="Crossing")
-        for vertex in self.vertices:
-            G.add_node(vertex.label, type="Vertex")
         for edge in self.edges:
             G.add_node(edge.label, type="Edge")
+        for vertex in self.vertices:
+            G.add_node(vertex.label, type="Vertex")
+        for crossing in self.crossings:
+            G.add_node(crossing.label, type="Crossing")
+
 
         # Add intermediate nodes and label intermediate edges
         intermediate_counter = 0
@@ -679,5 +680,7 @@ class SpatialGraphDiagram:
         # Step 1: Create the planar-friendly graph
         planar_graph, node_labels, edge_labels = self.planar_embedding()
 
-        plot_spatial_graph_diagram(planar_graph, node_labels, edge_labels)
+        p = plot_spatial_graph_diagram(planar_graph, node_labels, edge_labels)
+
+        p.show()
 

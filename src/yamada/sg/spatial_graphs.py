@@ -37,7 +37,7 @@ class SpatialGraph:
         self.edges = edges
         self.edge_pairs = list(combinations(self.edges, 2))
 
-        self.adjacent_edge_pairs = self._get_adjacent_edge_pairs()
+        self.adjacent_edge_pairs = self.get_adjacent_edge_pairs()
         self.nonadjacent_edge_pairs = [edge_pair for edge_pair in self.edge_pairs if
                                        edge_pair not in self.adjacent_edge_pairs]
 
@@ -65,7 +65,7 @@ class SpatialGraph:
         return adjacent_nodes
 
 
-    def _get_adjacent_edge_pairs(self):
+    def get_adjacent_edge_pairs(self):
 
         adjacent_edge_pairs = set()  # Using a set to avoid duplicates
 
@@ -790,9 +790,9 @@ class SpatialGraph:
         # Create the vertex and crossing objects
         # len([edge for edge in self.edges if node in edge])
         vertex_node_degrees = [len([edge for edge in self.edges if node in edge]) for node in self.nodes]
-        vertices = [Vertex(degree, 'node_' + node) for node, degree in zip(self.nodes,vertex_node_degrees)]
+        vertices = [Vertex(degree, 'v_' + node) for node, degree in zip(self.nodes,vertex_node_degrees)]
         if self.crossing_positions is not None:
-            crossings = [Crossing('crossing_object_' + str(i)) for i in range(len(self.crossing_positions))]
+            crossings = [Crossing('c_' + str(i)) for i in range(len(self.crossing_positions))]
         else:
             crossings = []
         vertices_and_crossings = vertices + crossings
