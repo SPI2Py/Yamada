@@ -624,56 +624,6 @@ class SpatialGraphDiagram:
 
         return yamada_poly
 
-    # def planar_embedding(self):
-    #     """
-    #     Creates a planar embedding of the spatial graph diagram by introducing intermediate nodes
-    #     and labeling intermediate edges and nodes.
-    #
-    #     Returns:
-    #         G: Planar-friendly NetworkX graph.
-    #         node_labels: Dictionary of labels for intermediate nodes.
-    #         edge_labels: Dictionary of labels for intermediate edges.
-    #     """
-    #     G = nx.Graph()
-    #     node_labels = {}
-    #     edge_labels = {}
-    #
-    #     # Add nodes for vertices, crossings, and edges with their type
-    #     for edge in self.edges:
-    #         G.add_node(edge.label, type="Edge")
-    #     for vertex in self.vertices:
-    #         G.add_node(vertex.label, type="Vertex")
-    #     for crossing in self.crossings:
-    #         G.add_node(crossing.label, type="Crossing")
-    #
-    #
-    #     # Add intermediate nodes and label intermediate edges
-    #     intermediate_counter = 0
-    #     for edge in self.edges:
-    #         for i, (connected_obj, index) in enumerate(edge.adjacent):
-    #             # Create an intermediate node
-    #             intermediate_node = f"int_{intermediate_counter}"
-    #             intermediate_counter += 1
-    #
-    #             # Add intermediate node with its type
-    #             G.add_node(intermediate_node, type="Intermediate")
-    #
-    #             # Create labeled edges
-    #             intermediate_edge_1 = f"{edge.label}[{i}]"
-    #             intermediate_edge_2 = f"{connected_obj.label}[{index}]"
-    #
-    #             # Connect intermediate edges with intermediate node
-    #             G.add_edge(edge.label, intermediate_node, label=i)  # Edge index
-    #             G.add_edge(intermediate_node, connected_obj.label, label=index)  # Edge index
-    #
-    #             # Save labels for intermediate edges
-    #             edge_labels[(edge.label, intermediate_node)] = str(i)
-    #             edge_labels[(intermediate_node, connected_obj.label)] = str(index)
-    #
-    #             # Save labels for intermediate nodes
-    #             node_labels[intermediate_node] = f"{edge.label}[{i}]={connected_obj.label}[{index}]"
-    #
-    #     return G, node_labels, edge_labels
     def planar_embedding(self):
         """
         Returns the underlying planar embedding of an abstract graph.

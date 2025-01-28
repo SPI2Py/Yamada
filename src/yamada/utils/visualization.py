@@ -43,11 +43,21 @@ def tutte_embedding_positions(planar_graph):
     return ans
 
 
-def _position_spatial_graph_in_3d(G, z_height=20):
+        
+def position_spatial_graph_in_3d(G, z_height=20):
+
     def norm_label(X):
         L = X.label
         return repr(L) if not isinstance(L, str) else L
-        
+
+    def end_label(edge, i):
+        i = i % 2
+        X, x = edge.adjacent[i]
+        L = norm_label(X)
+        if X in G.crossings:
+            L = L + '-' if x % 2 == 0 else L + '+'
+        return L
+
     P = G.planar_embedding()
     planar_pos = tutte_embedding_positions(P)
     system_node_pos = dict()
@@ -66,14 +76,6 @@ def _position_spatial_graph_in_3d(G, z_height=20):
     nodes_so_far = system_node_pos.copy()
     nodes_so_far.update(other_node_pos)
 
-    def end_label(edge, i):
-        i = i % 2
-        X, x = edge.adjacent[i]
-        L = norm_label(X)
-        if X in G.crossings:
-            L = L + '-' if x % 2 == 0 else L + '+'
-        return L
-
     for E in G.edges:
         L = norm_label(E)
         x, y = planar_pos[E.label]
@@ -81,7 +83,7 @@ def _position_spatial_graph_in_3d(G, z_height=20):
         B = end_label(E, 1)
         z = (nodes_so_far[A][2] + nodes_so_far[B][2]) // 2
         other_node_pos[L] = (x, y, z)
-        
+
     segments = list()
     vertex_inputs = set()
     for V in G.vertices:
@@ -101,11 +103,7 @@ def _position_spatial_graph_in_3d(G, z_height=20):
         vertex_inputs.remove((W, j))
         segments.append(one_seg)
 
-    return system_node_pos, other_node_pos, segments
-        
-def position_spatial_graph_in_3d(G, z_height=20):
-
-    system_node_pos, other_node_pos, segments = _position_spatial_graph_in_3d(G, z_height)
+    ###
 
     nodes = list(system_node_pos.keys())
     node_positions = list(system_node_pos.values())
