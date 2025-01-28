@@ -46,29 +46,31 @@ def tutte_embedding_positions(planar_graph):
         
 def position_spatial_graph_in_3d(G, z_height=20):
 
-    def norm_label(X):
-        L = X.label
-        return repr(L) if not isinstance(L, str) else L
+    def normalize_label(node):
+        """Normalizes the label of a node."""
+        label = node.label
+        return repr(label) if not isinstance(label, str) else label
 
-    def end_label(edge, i):
+    def get_end_label(edge, i):
+        """Returns the label of an edge's endpoint, adjusted for crossings."""
         i = i % 2
-        X, x = edge.adjacent[i]
-        L = norm_label(X)
-        if X in G.crossings:
-            L = L + '-' if x % 2 == 0 else L + '+'
-        return L
+        node, x = edge.adjacent[i]
+        label = normalize_label(node)
+        if node in G.crossings:
+            label += '-' if x % 2 == 0 else '+'
+        return label
 
     P = G.planar_embedding()
     planar_pos = tutte_embedding_positions(P)
     system_node_pos = dict()
     for V in G.vertices:
-        L = norm_label(V)
+        L = normalize_label(V)
         x, y = planar_pos[V.label]
         system_node_pos[L] = (x, y, 0)
 
     other_node_pos = dict()
     for C in G.crossings:
-        L = norm_label(C)
+        L = normalize_label(C)
         x, y = planar_pos[C.label]
         other_node_pos[L + '+'] = (x, y, z_height)
         other_node_pos[L + '-'] = (x, y, -z_height)
@@ -77,10 +79,10 @@ def position_spatial_graph_in_3d(G, z_height=20):
     nodes_so_far.update(other_node_pos)
 
     for E in G.edges:
-        L = norm_label(E)
+        L = normalize_label(E)
         x, y = planar_pos[E.label]
-        A = end_label(E, 0)
-        B = end_label(E, 1)
+        A = get_end_label(E, 0)
+        B = get_end_label(E, 1)
         z = (nodes_so_far[A][2] + nodes_so_far[B][2]) // 2
         other_node_pos[L] = (x, y, z)
 
@@ -94,12 +96,12 @@ def position_spatial_graph_in_3d(G, z_height=20):
         one_seg = []
         while not W in G.vertices:
             if W in G.edges:
-                L = norm_label(W)
-                A = end_label(W, j)
-                B = end_label(W, j + 1)
+                L = normalize_label(W)
+                A = get_end_label(W, j)
+                B = get_end_label(W, j + 1)
                 one_seg += [A, L]
             W, j = W.flow(j)
-        one_seg.append(norm_label(W))
+        one_seg.append(normalize_label(W))
         vertex_inputs.remove((W, j))
         segments.append(one_seg)
 
@@ -121,7 +123,6 @@ def position_spatial_graph_in_3d(G, z_height=20):
 
     segments = split_edges(segments)
 
-    # Convert segments from lists to tuples
 
     return nodes, node_positions, segments
 
@@ -157,6 +158,17 @@ def plot_spatial_graph_diagram(sgd):
         line = pv.Line(pos_dict[edge[0]], pos_dict[edge[-1]])
         plotter.add_mesh(line.tube(radius=0.1), color="black", label=str(edge))
 
+    # Add node labels
+    for node, coords in zip(nodes, node_positions):
+        label = node
+        plotter.add_point_labels(
+            [coords],
+            [label],
+            point_size=10,
+            font_size=12,
+            bold=True,
+            text_color="black",
+        )
 
     # # Add nodes as spheres
     # for node, coords in pos_3d.items():
