@@ -7,3 +7,5 @@ dist/*
 SPI2Py.egg-info/*
 .vscode/
 **/Yamada.egg-info/
+**Zone.Identifier
+*Zone.Identifier
