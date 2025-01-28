@@ -3,8 +3,6 @@ import matplotlib.colors as mcolors
 import networkx as nx
 import pyvista as pv
 import itertools
-import matplotlib
-matplotlib.use('TkAgg')
 from itertools import combinations
 from networkx.algorithms.planar_drawing import triangulate_embedding
 import numpy as np
@@ -129,9 +127,112 @@ def position_spatial_graph_in_3d(G, z_height=20):
 
     return nodes, node_positions, segments
 
-def plot_spatial_graph_diagram():
-    pass
+def plot_spatial_graph_diagram(sgd):
+    """
+    Plots the spatial graph diagram in 3D using PyVista.
+    Labels intermediate edges with index numbers and intermediate nodes with full index assignments.
+    """
+    # , planar_graph, node_labels, edge_labels
+    # # Check for planarity
+    # is_planar, embedding = nx.check_planarity(planar_graph)
+    # if not is_planar:
+    #     raise ValueError("The graph is not planar!")
 
+    # Generate 2D positions for the planar embedding
+    # pos = nx.planar_layout(embedding)
+    nodes, node_positions, edges = position_spatial_graph_in_3d(sgd)
+
+    # Extend positions to 3D by adding a z-coordinate (all zero for planar layout)
+    # pos_3d = {node: np.array([x, y, 0]) for node, (x, y) in pos.items()}
+
+    # Create a PyVista plotter
+    plotter = pv.Plotter()
+
+    # Plot nodes as spheres
+    for node, coords in zip(nodes, node_positions):
+        sphere = pv.Sphere(radius=0.5, center=coords)
+        plotter.add_mesh(sphere, color="black", opacity=0.8, label=str(node))
+
+    # Plot edges as tubes
+    pos_dict = dict(zip(nodes, node_positions))
+    for edge in edges:
+        line = pv.Line(pos_dict[edge[0]], pos_dict[edge[-1]])
+        plotter.add_mesh(line.tube(radius=0.1), color="black", label=str(edge))
+
+
+    # # Add nodes as spheres
+    # for node, coords in pos_3d.items():
+    #
+    #     if planar_graph.nodes[node]["type"] == "Edge":
+    #         color = "black"
+    #         opacity = 0.8
+    #         sphere = pv.Sphere(radius=0.01, center=coords)
+    #     elif planar_graph.nodes[node]["type"] == "Intermediate":
+    #         color = "black"
+    #         opacity = 0.8
+    #         sphere = pv.Sphere(radius=0.01, center=coords)
+    #     elif planar_graph.nodes[node]["type"] == "Vertex":
+    #         color = "lightblue"
+    #         opacity = 0.8
+    #         sphere = pv.Sphere(radius=0.05, center=coords)
+    #     elif planar_graph.nodes[node]["type"] == "Crossing":
+    #         color = "green"
+    #         opacity = 0.8
+    #         sphere = pv.Sphere(radius=0.05, center=coords)
+    #     else:
+    #         raise ValueError("Unknown node type!")
+    #         # color = "orange"
+    #         # opacity = 0.5
+    #         # sphere = pv.Sphere(radius=0.075, center=coords)
+    #
+    #     plotter.add_mesh(sphere, color=color, opacity=opacity, label=str(node))
+    #
+    # # Add edges as tubes
+    # for edge, edge_label in zip(planar_graph.edges, edge_labels.values()):
+    #     start, end = edge
+    #     line = pv.Line(pos_3d[start], pos_3d[end])
+    #     plotter.add_mesh(line.tube(radius=0.01), color="black", label=str(edge_label))
+    #
+    # # Add node labels
+    # for node, coords in pos_3d.items():
+    #     label = node_labels.get(node, str(node))
+    #     plotter.add_point_labels(
+    #         [coords],
+    #         [label],
+    #         point_size=10,
+    #         font_size=12,
+    #         bold=True,
+    #         text_color="black",
+    #     )
+    #
+    # # Add edge labels
+    # for edge, edge_label in zip(planar_graph.edges, edge_labels.values()):
+    #     midpoint = (pos_3d[edge[0]] + pos_3d[edge[1]]) / 2
+    #     plotter.add_point_labels(
+    #         [midpoint],
+    #         [str(edge_label)],
+    #         point_size=10,
+    #         font_size=10,
+    #         bold=False,
+    #         text_color="blue",
+    #     )
+    #
+    # # State all object-index assignments
+    # intermediate_label_text = "Object-Index Pairs \n" + "\n".join(f"{label}" for node, label in node_labels.items())
+    # text_coords = [0.8, 0.2, 0.0]  # Position the text box in normalized coordinates
+    # plotter.add_text(
+    #     intermediate_label_text,
+    #     position="upper_right",
+    #     font_size=10,
+    #     color="black",
+    #     viewport=True
+    # )
+    #
+    # # Finalize the plot
+    # plotter.add_axes()
+    # plotter.add_legend()
+    # plotter.show(title="Spatial Graph Diagram")
+    return plotter
 
 def plot_spatial_graph(nodes, node_positions, edges, contiguous_sub_edges, contiguous_sub_edge_positions):
 
@@ -146,9 +247,6 @@ def plot_spatial_graph(nodes, node_positions, edges, contiguous_sub_edges, conti
     p.subplot(0, 0)
     p.add_title("3D Spatial Graph")
 
-    # # Function to calculate offset position
-    # def calculate_offset_position(position, offset=[0.1, 0.1, 0.1]):
-    #     return position + np.array(offset)
 
     for contiguous_edge, contiguous_edge_positions_i in zip(contiguous_sub_edges, contiguous_sub_edge_positions):
         start_node = contiguous_edge[0]
@@ -184,7 +282,8 @@ def plot_spatial_graph(nodes, node_positions, edges, contiguous_sub_edges, conti
         p.add_mesh(linear_spline, line_width=5, color="k")
 
     # Configure the plot
-    p.view_isometric()
+    # p.view_isometric()
+    # p.view_xz()
     p.show_axes()
 
     # Reset the color cycle for 2D edges
@@ -213,88 +312,7 @@ def plot_spatial_graph(nodes, node_positions, edges, contiguous_sub_edges, conti
     p.show_axes()
     # p.add_legend(size=(0.1, 0.5), border=True, bcolor='white', loc='center right')
 
+    # Link the two plots
+    p.link_views()
+
     return p
-
-
-def plot_spatial_graph_diagram(planar_graph, node_labels, edge_labels):
-    """
-    Plots the spatial graph diagram in 3D using PyVista.
-    Labels intermediate edges with index numbers and intermediate nodes with full index assignments.
-    """
-
-    # Check for planarity
-    is_planar, embedding = nx.check_planarity(planar_graph)
-    if not is_planar:
-        raise ValueError("The graph is not planar!")
-
-    # Generate 2D positions for the planar embedding
-    pos = nx.planar_layout(embedding)
-
-    # Extend positions to 3D by adding a z-coordinate (all zero for planar layout)
-    pos_3d = {node: np.array([x, y, 0]) for node, (x, y) in pos.items()}
-
-    # Create a PyVista plotter
-    plotter = pv.Plotter()
-
-    # Add nodes as spheres
-    for node, coords in pos_3d.items():
-
-        if planar_graph.nodes[node]["type"] == "Edge":
-            color = "black"
-            opacity = 0.8
-            sphere = pv.Sphere(radius=0.01, center=coords)
-        elif planar_graph.nodes[node]["type"] == "Intermediate":
-            color = "black"
-            opacity = 0.8
-            sphere = pv.Sphere(radius=0.01, center=coords)
-        elif planar_graph.nodes[node]["type"] == "Vertex":
-            color = "lightblue"
-            opacity = 0.8
-            sphere = pv.Sphere(radius=0.05, center=coords)
-        elif planar_graph.nodes[node]["type"] == "Crossing":
-            color = "green"
-            opacity = 0.8
-            sphere = pv.Sphere(radius=0.05, center=coords)
-        else:
-            raise ValueError("Unknown node type!")
-            # color = "orange"
-            # opacity = 0.5
-            # sphere = pv.Sphere(radius=0.075, center=coords)
-
-        plotter.add_mesh(sphere, color=color, opacity=opacity, label=str(node))
-
-    # Add edges as tubes
-    for edge, edge_label in zip(planar_graph.edges, edge_labels.values()):
-        start, end = edge
-        line = pv.Line(pos_3d[start], pos_3d[end])
-        plotter.add_mesh(line.tube(radius=0.01), color="black", label=str(edge_label))
-
-    # # Add node labels
-    # for node, coords in pos_3d.items():
-    #     label = node_labels.get(node, str(node))
-    #     plotter.add_point_labels(
-    #         [coords],
-    #         [label],
-    #         point_size=10,
-    #         font_size=12,
-    #         bold=True,
-    #         text_color="black",
-    #     )
-    #
-    # # Add edge labels
-    # for edge, edge_label in zip(planar_graph.edges, edge_labels.values()):
-    #     midpoint = (pos_3d[edge[0]] + pos_3d[edge[1]]) / 2
-    #     plotter.add_point_labels(
-    #         [midpoint],
-    #         [str(edge_label)],
-    #         point_size=10,
-    #         font_size=10,
-    #         bold=False,
-    #         text_color="blue",
-    #     )
-
-    # Finalize the plot
-    plotter.add_axes()
-    plotter.add_legend()
-    plotter.show(title="Spatial Graph Diagram")
-    return plotter
