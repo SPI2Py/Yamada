@@ -640,12 +640,12 @@ class SpatialGraphDiagram:
 
         G.check_structure()
         return G
+
     def plot(self):
 
-        # Step 1: Create the planar-friendly graph
-        # planar_graph, node_labels, edge_labels = self.planar_embedding()
-
-        # p = plot_spatial_graph_diagram(self, planar_graph, node_labels, edge_labels)
         p = plot_spatial_graph_diagram(self)
+
+        # planar_graph = self.planar_embedding()
+        # p = plot_spatial_graph_diagram(planar_graph)
         p.show()
 

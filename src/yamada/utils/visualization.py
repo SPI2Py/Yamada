@@ -62,6 +62,7 @@ def position_spatial_graph_in_3d(G, z_height=20):
 
     P = G.planar_embedding()
     planar_pos = tutte_embedding_positions(P)
+
     system_node_pos = dict()
     for V in G.vertices:
         L = normalize_label(V)
