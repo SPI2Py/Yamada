@@ -196,6 +196,7 @@ def compute_intermediate_y_position(a:     np.ndarray,
 
     return y_int
 
+
 def compute_3D_intersection(a0_position, a1_position, a2_position, a3_position, x0z_coords):
     """
     If two 3D lines are projected onto the XZ plane and their projections intersect, then
@@ -244,6 +245,7 @@ def compute_3D_intersection(a0_position, a1_position, a2_position, a3_position, 
     position_c_13 = np.array([xc, y_c_13, zc])
 
     return position_c_02, position_c_13
+
 
 def compute_counter_clockwise_angle(vector_a: np.ndarray,
                                     vector_b: np.ndarray) -> float:
