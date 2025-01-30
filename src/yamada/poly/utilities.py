@@ -42,14 +42,14 @@ def reverse_poly(poly):
     """
     """
 
-    A = pari('A')
+    a = pari('A')
 
     coeffs, exps = get_coefficients_and_exponents(poly)
 
     ans = pari(0)
 
-    for c, e in zip(coeffs, exps):
-        ans += c * A ** (-e)
+    for coeff, exp in zip(coeffs, exps):
+        ans += coeff * a ** (-exp)
 
     return ans
 
@@ -58,13 +58,13 @@ def normalize_poly(yamada_polynomial):
     """normalized_yamada_polynomial
     """
 
-    A = pari('A')
+    a = pari('A')
 
     _, exps = get_coefficients_and_exponents(yamada_polynomial)
-    a, b = min(exps), max(exps)
-    ans1 = (-A) ** (-a) * yamada_polynomial
-    ans2 = (-A) ** b * reverse_poly(yamada_polynomial)
 
-    normalized_yamada_polynomial = min([ans1, ans2], key=list)
+    ans1 = (-a) ** (-min(exps)) * yamada_polynomial
+    ans2 = (-a) ** max(exps) * reverse_poly(yamada_polynomial)
 
-    return normalized_yamada_polynomial
+    normalized_poly = min([ans1, ans2], key=list)
+
+    return normalized_poly

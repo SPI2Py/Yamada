@@ -46,5 +46,4 @@ pythonpath = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/Chad-Peterson/Yamada"
-"Bug Tracker" = "https://github.com/Chad-Peterson/Yamada/issues"
+"Homepage" = "https://github.com/UIUC-ESDL/Yamada"

@@ -25,13 +25,8 @@ jobs:
       - name: Install project.
         run: pip install .[test]
 
-        # Some unit tests are written in Jupyter notebooks. However, PyTest does not parse notebooks.
-        # Therefore, we convert the notebooks to scripts and run the tests on the scripts.
-      - name: Ensure all tests reflect the latest Jupyter notebooks.
-        run: cd tests && python convert_notebooks_to_scripts.py
-
       - name: Run tests.
-        run:  cd .. && pytest
+        run:  pytest
 
   # Test on all supported Python versions.
   Python:
@@ -54,10 +49,5 @@ jobs:
       - name: Install package.
         run:  pip install .[test]
 
-        # Some unit tests are written in Jupyter notebooks. However, PyTest does not parse notebooks.
-        # Therefore, we convert the notebooks to scripts and run the tests on the scripts.
-      - name: Ensure all tests reflect the latest Jupyter notebooks.
-        run: cd tests && python convert_notebooks_to_scripts.py
-
       - name: Run tests.
-        run:  cd .. && pytest
+        run:  pytest

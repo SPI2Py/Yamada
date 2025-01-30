@@ -1,4 +1,4 @@
-from yamada.poly.H_polynomial import h_poly, has_cut_edge, remove_valence_two_vertices
+from yamada.poly.h_polynomial import h_poly, has_cut_edge, remove_valence_two_vertices
 
 from yamada.sgd.diagram_elements import Vertex, Edge, Crossing
 

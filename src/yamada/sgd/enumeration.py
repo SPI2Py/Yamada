@@ -1,5 +1,4 @@
 import networkx as nx
-import collections
 import itertools
 import subprocess
 import io

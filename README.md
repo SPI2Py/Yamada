@@ -13,8 +13,6 @@ https://doi.org/10.1115/DETC2021-66900)
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE)
 
 
-![Yamada Logo](./images/yamada_logo.png)
-
 ## Spatial Topologies and Yamada Polynomials
 
 Systems such as automotive cooling layouts, hybrid-electric power trains, and aero-engines are made up of interconnected

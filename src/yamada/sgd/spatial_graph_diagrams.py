@@ -52,7 +52,7 @@ from matplotlib.patches import FancyArrowPatch, PathPatch
 from matplotlib.path import Path
 import numpy as np
 
-from yamada.poly.H_polynomial import h_poly
+from yamada.poly.h_polynomial import h_poly
 from yamada.poly.utilities import get_coefficients_and_exponents, normalize_poly
 from yamada.sgd.diagram_elements import Vertex, Edge, Crossing
 from ..utils.visualization import plot_spatial_graph_diagram
