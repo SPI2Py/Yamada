@@ -60,24 +60,54 @@ def position_spatial_graph_in_3d(G, z_height=20):
             label += '-' if x % 2 == 0 else '+'
         return label
 
+    def position_nodes(planar_pos):
+        """
+        Position vertices and crossings in 3D.
+        Returns dictionaries for system node positions and other node positions.
+        """
+        system_node_positions = {}
+        other_node_positions = {}
+
+        # Position vertices (z = 0)
+        for vertex in G.vertices:
+            label = normalize_label(vertex)
+            x, y = planar_pos[vertex.label]
+            system_node_positions[label] = (x, y, 0)
+
+        # Position crossings (z = ±z_height)
+        for crossing in G.crossings:
+            label = normalize_label(crossing)
+            x, y = planar_pos[crossing.label]
+            other_node_positions[f"{label}+"] = (x, y, z_height)
+            other_node_positions[f"{label}-"] = (x, y, -z_height)
+
+        return system_node_positions, other_node_positions
+
+    # def position_edges(planar_pos, node_positions):
+    #     """
+    #     Position edges in 3D based on the midpoint of their endpoints.
+    #     Updates the other node positions dictionary.
+    #     """
+    #     edge_positions = {}
+    #
+    #     for edge in G.edges:
+    #         label = normalize_label(edge)
+    #         x, y = planar_pos[edge.label]
+    #         start_label = get_end_label(edge, 0)
+    #         end_label = get_end_label(edge, 1)
+    #         z = (node_positions[start_label][2] + node_positions[end_label][2]) // 2
+    #         edge_positions[label] = (x, y, z)
+    #
+    #     return edge_positions
+
     P = G.planar_embedding()
     planar_pos = tutte_embedding_positions(P)
 
-    system_node_pos = dict()
-    for V in G.vertices:
-        L = normalize_label(V)
-        x, y = planar_pos[V.label]
-        system_node_pos[L] = (x, y, 0)
-
-    other_node_pos = dict()
-    for C in G.crossings:
-        L = normalize_label(C)
-        x, y = planar_pos[C.label]
-        other_node_pos[L + '+'] = (x, y, z_height)
-        other_node_pos[L + '-'] = (x, y, -z_height)
-
+    system_node_pos, other_node_pos = position_nodes(planar_pos)
     nodes_so_far = system_node_pos.copy()
     nodes_so_far.update(other_node_pos)
+
+    # edge_positions = position_edges(planar_pos, {**system_node_pos, **other_node_pos})
 
     for E in G.edges:
         L = normalize_label(E)

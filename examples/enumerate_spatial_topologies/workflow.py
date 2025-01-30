@@ -52,10 +52,36 @@ print("Number of Unique Spatial Topologies: ", len(unique_spatial_topologies))
 print("Number of Pairs of Unique Spatial Topologies: ", len(sgd_pairs))
 
 
-td1 = compute_min_distance(sgd_pairs[0][0], sgd_pairs[0][1])
-print("Topological Distance: ", td1)
+# td1 = compute_min_distance(sgd_pairs[0][0], sgd_pairs[0][1])
+# print("Topological Distance: ", td1)
+
+# Loop through each SGD pair and construct a topological distance network
+aggregated_network = nx.DiGraph()
+
+# Process each pair of diagrams
+for diagram1, diagram2 in sgd_pairs:
+    # Compute the network for the current pair
+    _, pair_network = compute_min_distance(diagram1, diagram2)
+
+    # Add nodes and edges to the aggregated network
+    for node, neighbors in pair_network.items():
+        for neighbor in neighbors:
+            aggregated_network.add_edge(node, neighbor)
 
 
+# Visualize the aggregated network
+import matplotlib.pyplot as plt
+
+nx.draw(
+    aggregated_network,
+    with_labels=False,
+    node_size=1000,
+    node_color="lightblue",
+    font_size=10,
+    font_weight="bold"
+)
+plt.show()
+plt.savefig('graph3.png')
 
 print("Done")
 
